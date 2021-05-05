@@ -10,3 +10,8 @@ More of a macro, also relies on the dropdown search coming back in a reasonable 
 
 ## Count On Editing Summary
 Adds a total count of IMPs to your editing summary page.
+
+## Migrate Features Too
+The GCD already shows a 'Migrate credits' button that migrates both text creators and text features.
+That button doesn't show if there are no creators to migrate, even if there is still a text feature.
+This adds a 'Migrate Feature' button where appropriate.
