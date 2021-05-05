@@ -2,7 +2,7 @@
 // @name         Count on editing summary
 // @namespace    http://tampermonkey.net/
 // @version      0.1
-// @description  Show a count of pending on editing page
+// @description  Show a count of pending on editing summary page
 // @author       Adam Knights
 // @match        https://www.comics.org/queues/editing/
 // @grant        none
