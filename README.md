@@ -18,3 +18,6 @@ This adds a 'Migrate Feature' button where appropriate.
 
 # Questions and Typeset
 Adds a button to the sequence edit page, when pressed it populates anything not marked as 'no' (i.e. 'no script') with a ? and letters with typeset. If a text field is already populated it is not overwritten.
+
+# Pending Page Sort
+Adds sorting to the pending page. Click a table column header to sort. Click again to reverse the sort.
