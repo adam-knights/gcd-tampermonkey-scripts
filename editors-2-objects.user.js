@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.2
 // @description  Take editor text credits and move to creators
-// @author       You
+// @author       Adam Knights
 // @match        https://www.comics.org/issue/revision/*/edit/?edit_issue_*
 // @match        https://www.comics.org/issue/*/add_variant_issue/?add*
 // @grant        none
