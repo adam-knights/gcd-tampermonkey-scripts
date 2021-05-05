@@ -7,3 +7,6 @@ More of a macro, also relies on the dropdown search coming back in a reasonable 
 ### Future Improvements
  - Handle `Joseph Bloggs (credited as Joe Bloggs)` correctly
  - Change from a set time on the dropdown to actually monitoring for either a change in state or a network call
+
+## Count On Editing Summary
+Adds a total count of IMPs to your editing summary page.
