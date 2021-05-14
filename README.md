@@ -1,6 +1,14 @@
 # gcd-tampermonkey-scripts
 Scripts that I've written in Tampermonkey to improve my own indexing experience. Everything here has been written with a script mentality so can easily be improved. I'll accept pull requests with improvements or fixes.
 
+## Copy and paste story complete
+Allows you to copy stories within a given issue, once the sequence is filled out hit copy at the top. Then after clicking 'add story' you can paste.
+
+### Future Improvements
+ - Show buttons more appropriately
+ - Don't paste over if any edits to new story
+ - Copy from a sequence when viewing an issue, paste back in same way
+
 ## Editors 2 Objects
 More of a macro, also relies on the dropdown search coming back in a reasonable time.
 
