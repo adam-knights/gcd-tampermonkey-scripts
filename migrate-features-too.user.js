@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Migrate features too
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.2.1
 // @description  Take editor text credits and move to creators
 // @author       Adam Knights
 // @match        https://www.comics.org/changeset/*/edit/
@@ -35,7 +35,7 @@ function getMigrateButtonHtml(storyId) {
     $('.story_list').eq(1).find('tr').each((index, element) => {
         const hasMigrateAlready = $(element).find('input[value="Migrate Credits"]').length === 1;
 
-        const hasFeatureObjectAlready = $(element).find('a[href*="feature"]').length === 1;
+        const hasFeatureObjectAlready = $(element).find('a[href*="feature"]').length >= 1;
 
         const hasNoFeature = $(element).find('span:contains("no feature")').length === 1;
 
