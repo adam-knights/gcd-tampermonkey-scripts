@@ -18,7 +18,8 @@ function sumCounts() {
       return 0;
     }
 
-    return $.map(rows, r => $.map($(r).find('td:first'), c => parseInt($(c).text().trim()))).reduce((a, b) => isNaN(a) && isNaN(b) ? 0 : isNaN(a) ? b : isNaN(b) ? a : a + b);
+    let count = $.map(rows, r => $.map($(r).find('td:first'), c => parseInt($(c).text().trim()))).reduce((a, b) => isNaN(a) && isNaN(b) ? 0 : isNaN(a) ? b : isNaN(b) ? a : a + b);
+    return isNaN(count) ? 0 : count;
 }
 
 (async function() {
