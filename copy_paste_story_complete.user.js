@@ -80,6 +80,10 @@ function featureHtml(featureId, position, name) {
                 let controlName = gcd_form_noncreator[i].name;
                 let controlValue = gcd_form_noncreator[i].value;
 
+                if (controlValue === 'on') {
+                    $(`#id_${controlName}`).prop('checked', true).change();
+                }
+
                 $("#id_" + controlName).val(controlValue);
                 $("#wmd-input-id_" + controlName).val(controlValue);
             }
