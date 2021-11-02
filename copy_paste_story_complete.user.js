@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Copy and paste story complete
 // @namespace    http://tampermonkey.net/
-// @version      0.2
-// @description  Adds button to copy a story on edit story page, works to paste on new story from 'add story'. TODO: copy story from view of a comic
+// @version      0.3
+// @description  Adds button to copy a story on edit story page, works to paste on new story from 'add story'. TODO: character objects, copy story from view of a comic
 // @author       Adam Knights
 // @require      https://cdnjs.cloudflare.com/ajax/libs/localforage/1.9.0/localforage.min.js
 // @match        https://www.comics.org/story/revision/*/edit/*
@@ -18,7 +18,7 @@
 function featureHtml(featureId, position, name) {
   return `<option value="${featureId}" selected="" data-select2-id="${position}">${name}</option>`;
 }
-
+  
 (async function() {
     'use strict';
 
@@ -35,8 +35,8 @@ function featureHtml(featureId, position, name) {
     $("div.edit").prepend('<button type="button" id="copy" style="margin-right: 10px"><i class="far fa-copy" style="color: blue"></i> Copy Data</button><button type="button" id="paste"><i class="fas fa-paste"  style="color: blue"></i> Paste Data</button>');
 
     $("#copy").click(async function (e) {
-        // this will save the form data, serialized as an array in a cookie named formData
-        var nonCreatorObjectForm = $form.serializeArray().filter(f => f.name !== 'sequence_number' && f.name !== 'csrfmiddlewaretoken' && f.name !== 'feature_object' && !f.name.includes('story_credit_revisions') && f.name !== 'creator_help');
+        // this will save the form data, serialized as an array into local / indexedb storage
+        var nonObjectForm = $form.serializeArray().filter(f => f.name !== 'sequence_number' && f.name !== 'csrfmiddlewaretoken' && f.name !== 'feature_object' && !f.name.includes('story_credit_revisions') && !f.name.includes('story_character_revisions') && f.name !== 'creator_help' && f.name !== 'character_help' && f.name !== 'language_code');
         var featureObjectForm = $form.serializeArray().filter(f => f.name === 'feature_object');
 
         // Exclude fields we don't need to keep size down
@@ -66,7 +66,7 @@ function featureHtml(featureId, position, name) {
             }
         }
 
-        await localforage.setItem('gcd_form_noncreator', nonCreatorObjectForm);
+        await localforage.setItem('gcd_form_noncreator', nonObjectForm);
         await localforage.setItem('gcd_form_featureobject', featureObjectForm);
         await localforage.setItem('gcd_form_creatorobject', creatorObjectForm);
         await localforage.setItem('gcd_form_genre', genreObjectForm);
@@ -98,12 +98,12 @@ function featureHtml(featureId, position, name) {
         }
 
         let gcd_form_creatorobject = await localforage.getItem('gcd_form_creatorobject');
-        console.log(gcd_form_creatorobject);
+
         if (gcd_form_creatorobject) {
             const totalFormsRequired = Number(gcd_form_creatorobject.find(f => f.name === 's_c_r-TOTAL_FORMS').value);
             // First make the empty names tables
             for (let i = 1; i < totalFormsRequired; i++) {
-                $('.add-row').click();
+                $('.add-row').first().click();
             }
 
             for (let i = 0; i < gcd_form_creatorobject.length; i++) {
@@ -116,15 +116,16 @@ function featureHtml(featureId, position, name) {
                 }
 
                 if (controlName.includes('-creator')) {
-                  $(`#id_${controlName}`).append(`<option value="${controlValue}" selected="" data-select2-id="7">${gcd_form_creatorobject[i].cn}</option>`);
+                  $(`#id_${controlName} option`).removeAttr('selected')
+                  $(`#id_${controlName}`).append(`<option value="${controlValue}" selected="">${gcd_form_creatorobject[i].cn}</option>`);
                     continue;
                 }
 
                 if (controlName.includes('-signature') && controlValue !== "") {
-                    $(`#id_${controlName}`).append(`<option value="${controlValue}" selected="" data-select2-id="42">${gcd_form_creatorobject[i].sn}</option>`);
+                    $(`#id_${controlName}`).append(`<option value="${controlValue}" selected="">${gcd_form_creatorobject[i].sn}</option>`);
                 }
 
-                if (controlName.includes('-is_credited') || controlName.includes('-is_signed') || controlName.includes('uncertain')) {
+                if (controlName.includes('-is_credited') || controlName.includes('-is_signed') || controlName.includes('uncertain') || controlName.includes('-is_sourced')) {
                     if (controlValue === 'on') {
                       $(`#id_${controlName}`).prop('checked', true).change();
                     } else {
