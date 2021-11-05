@@ -63,32 +63,31 @@ function parse(str) {
 }
 
 (async function() {
-    'use strict';
+  'use strict';
 
-    $('td:contains(Characters)').each(function() {
-        const left = $(this).next().text().trim();
-        const right = $(this).next().next().text().trim();
-        console.log(left);
-        console.log(right);
+  $('td:contains(Characters)').each(function() {
+      // Check this is a change, and not a new addition
+      if ($('td:contains(Characters)').first().parent().parent().children().first().children().last().text().trim() === 'Added') {
+        return;
+      }
 
-        if (!left && !right) {
-          return;
-        }
+      const left = $(this).next().text().trim();
+      const right = $(this).next().next().text().trim();
 
-        const countLeft = 1 + (left.match(new RegExp(";", "g")) || []).length;
-        const countRight = 1 + (right.match(new RegExp(";", "g")) || []).length;
-        $(this).parent().before(getCountHtml(parseInt(countLeft), parseInt(countRight)));
+      if (!left && !right) {
+        return;
+      }
 
-        const leftChars = parse(left);
-        const rightChars = parse(right);
-        console.log(leftChars);
-        console.log(rightChars);
+      const countLeft = 1 + (left.match(new RegExp(";", "g")) || []).length;
+      const countRight = 1 + (right.match(new RegExp(";", "g")) || []).length;
+      $(this).parent().before(getCountHtml(parseInt(countLeft), parseInt(countRight)));
 
-        const thingsOnLeftNotInRight = leftChars.filter(x => !rightChars.includes(x));
-        const thingsOnRightNotInLeft = rightChars.filter(x => !leftChars.includes(x));
-        console.log(thingsOnLeftNotInRight);
-        console.log(thingsOnRightNotInLeft);
+      const leftChars = parse(left);
+      const rightChars = parse(right);
 
-        insertCompareHtml($(this).parent(), thingsOnLeftNotInRight, thingsOnRightNotInLeft);
-    });
+      const thingsOnLeftNotInRight = leftChars.filter(x => !rightChars.includes(x));
+      const thingsOnRightNotInLeft = rightChars.filter(x => !leftChars.includes(x));
+
+      insertCompareHtml($(this).parent(), thingsOnLeftNotInRight, thingsOnRightNotInLeft);
+  });
 })();
