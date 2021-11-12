@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Editors 2 Objects
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Take editor text credits and move to creators
 // @author       Adam Knights
 // @match        https://www.comics.org/issue/revision/*/edit/?edit_issue_*
+// @match        https://www.comics.org/issue/revision/*/edit/
 // @match        https://www.comics.org/issue/*/add_variant_issue/?add*
 // @grant        none
 // ==/UserScript==
@@ -68,15 +69,38 @@ function getCreditDesc(editorSplit) {
         return bracketOne.toLowerCase() === 'credited' ? '' : bracketOne;
     }
 
-    if (bracketOne === 'credited') {
+    if (bracketOne.startsWith('credited')) {
        return bracketTwo;
     }
 
-    if (bracketTwo === 'credited') {
+    if (bracketTwo.startsWith('credited')) {
        return bracketOne;
     }
 
     return `${bracketOne}, ${bracketTwo}`;
+}
+
+function checkForAltName(editorSplit) {
+    let bracketOne = editorSplit.length < 2 ? '' : editorSplit[1].split(')')[0].trim();
+    let bracketTwo = editorSplit.length < 3 ? '' : editorSplit[2].split(')')[0].trim();
+
+    if (bracketOne === '') {
+      return null;
+    }
+
+    if (bracketOne.startsWith('credited as')) {
+      return bracketOne.split('credited as')[1].trim();
+    }
+
+    if (bracketTwo === '') {
+      return null;
+    }
+
+    if (bracketTwo.startsWith('credited as')) {
+      return bracketTwo.split('credited as')[1].trim();
+    }
+
+    return null
 }
 
 function addMigrationInfoLine(line, isError, highlight) {
@@ -94,6 +118,12 @@ async function migrateEditor(editor, previousEditorsCount, markCredited) {
     let editorSplit = editor.split('(');
 
     let name = editorSplit[0].trim();
+
+    let altName = checkForAltName(editorSplit);
+
+    if (altName !== null) {
+        name = altName;
+    }
 
     if ((editor.match(/\(/g) || []).length > 2) {
         handleFailToAddEditorObject(`Too many brackets for ${name}`);
