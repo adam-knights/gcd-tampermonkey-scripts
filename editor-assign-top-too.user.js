@@ -6,14 +6,15 @@
 // @author       Adam Knights
 // @match        https://www.comics.org/changeset/*/compare/
 // @grant        none
+// @require      https://code.jquery.com/jquery-3.5.1.js
 // ==/UserScript==
 
 /* eslint-env jquery */
 
-// @require https://code.jquery.com/jquery-3.5.1.js
-
 (async function() {
     'use strict';
+
+    var $ = window.jQuery;
 
     if ($('input[name="assign"]').length > 0) {
         $(`<input id="topAssign" type="button" value="Assign">`).insertAfter('.body_content h1');
