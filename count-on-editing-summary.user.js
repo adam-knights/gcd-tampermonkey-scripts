@@ -12,19 +12,19 @@
 /* eslint-env jquery */
 
 function sumCounts() {
-    let rows = $('.queues table tr');
+  let rows = $('.queues table tr');
 
-    if (rows.length === 0) {
-      return 0;
-    }
+  if (rows.length === 0) {
+    return 0;
+  }
 
-    let count = $.map(rows, r => $.map($(r).find('td:first'), c => parseInt($(c).text().trim()))).reduce((a, b) => isNaN(a) && isNaN(b) ? 0 : isNaN(a) ? b : isNaN(b) ? a : a + b);
-    return isNaN(count) ? 0 : count;
+  let count = $.map(rows, r => $.map($(r).find('td:first'), c => parseInt($(c).text().trim()))).reduce((a, b) => isNaN(a) && isNaN(b) ? 0 : isNaN(a) ? b : isNaN(b) ? a : a + b);
+  return isNaN(count) ? 0 : count;
 }
 
 (async function() {
-    'use strict';
+  'use strict';
 
-    let total = sumCounts();
-    $('.queues h1').text($('.queues h1').text() + `(Pending count is ${total} IMPs)`);
+  let total = sumCounts();
+  $('.queues h1').text($('.queues h1').text() + `(Pending count is ${total} IMPs)`);
 })();

@@ -67,14 +67,14 @@ return result;
 
   $('tr.True td:contains(Characters)').each(function() {
       // Check this is a change, and not a new addition
-      if ($('td:contains(Characters)').first().parent().parent().children().first().children().last().text().trim() === 'Added') {
+      if ($(this).first().parent().parent().children().first().children().last().text().trim() === 'Added') {
         return;
       }
 
       let left = $(this).next().text().trim();
       let right = $(this).next().next().text().trim();
 
-      if (!left && !right) {
+      if (!left || !right) {
         return;
       }
 

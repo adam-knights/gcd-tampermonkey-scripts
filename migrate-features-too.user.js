@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Migrate features too
 // @namespace    http://tampermonkey.net/
-// @version      0.3.0
+// @version      0.4.0
 // @description  Take editor text credits and move to creators
 // @author       Adam Knights
 // @match        https://www.comics.org/changeset/*/edit/
@@ -28,6 +28,10 @@ function getMigrateButtonHtml(storyId, nextPos) {
         csrfCopy = $('.story_list').eq(1).find('[name="csrfmiddlewaretoken"]').eq(0);
     } else {
         return;
+    }
+
+    if (csrfCopy.length === 0) {
+      csrfCopy = $('[name="csrfmiddlewaretoken"]').eq(-2)
     }
 
     let nextPos = 0;
