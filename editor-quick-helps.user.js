@@ -16,6 +16,12 @@
 
     var $ = window.jQuery;
 
+    // Add series search button on new series changesets
+    if ($('.body_content h1 a').length > 0 && $('.body_content h1 a').prop('href').includes('/series/revision/')) {
+        let series = $('.body_content h1 a').text().replace(' ', '+');
+        $(`<a href="/searchNew/?q=${series}&selected_facets=facet_model_name_exact:series" target="_blank">Search for similar series</a>`).insertAfter('.body_content h1')
+    }
+
     // Add creator search button on new creator changesets
     if ($('.body_content h1 a').length > 0 && $('.body_content h1 a').prop('href').includes('/creator/revision/')) {
         let creator = $('.body_content h1 a').text().replace(' ', '+');
