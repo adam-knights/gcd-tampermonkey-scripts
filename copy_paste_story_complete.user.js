@@ -2,7 +2,7 @@
 // @name         Copy and paste story complete
 // @namespace    http://tampermonkey.net/
 // @version      0.4
-// @description  Adds button to copy a story on edit story page, works to paste on new story from 'add story'. TODO: copy story from view of a comic
+// @description  Adds button to copy a story on edit story page, works to paste on new story from 'add story'.
 // @author       Adam Knights
 // @require      https://cdnjs.cloudflare.com/ajax/libs/localforage/1.9.0/localforage.min.js
 // @match        https://www.comics.org/story/revision/*/edit/*
@@ -19,6 +19,51 @@ function featureHtml(featureId, position, name) {
     return `<option value="${featureId}" selected="" data-select2-id="${position}">${name}</option>`;
   }
   
+  async function pasteCharacters() {
+      let gcd_form_characterobject = await localforage.getItem('gcd_form_characterobject');
+  
+      if (gcd_form_characterobject) {
+          const totalFormsRequired = Number(gcd_form_characterobject.find(f => f.name === 's_c_r-TOTAL_FORMS').value);
+          // First make the empty characters tables
+          for (let i = 1; i < totalFormsRequired; i++) {
+              $('.add-row').last().click();
+          }
+  
+          for (let i = 0; i < gcd_form_characterobject.length; i++) {
+              let controlName = gcd_form_characterobject[i].name.replace('s_c_r', 'story_character_revisions');
+  
+              let controlValue = gcd_form_characterobject[i].value ?? "";
+  
+              if (controlName === 'story_character_revisions-INITIAL_FORMS') {
+                  controlValue = "0";
+              }
+  
+              if (controlName.includes('-character')) {
+                  $(`#id_${controlName} option`).removeAttr('selected')
+                  $(`#id_${controlName}`).append(`<option value="${controlValue}" selected="">${gcd_form_characterobject[i].cn}</option>`);
+                  continue;
+              }
+  
+              if (controlName.includes('-group')) {
+                  $(`#id_${controlName}`).append(`<option value="${controlValue}" selected="">${gcd_form_characterobject[i].gn}</option>`);
+                  continue;
+              }
+  
+              if (controlName.includes('-additional_information') || controlName.includes('-is_flashback') || controlName.includes('-is_origin') || controlName.includes('-is_death')) {
+                  if (controlValue === 'on') {
+                      $(`#id_${controlName}`).prop('checked', true).change();
+                  } else {
+                      $(`#id_${controlName}`).prop('checked', false);
+                  }
+                  continue;
+              }
+  
+              $("#id_" + controlName).val(controlValue);
+              $("#wmd-input-id_" + controlName).val(controlValue);
+          }
+      }
+  }
+  
   (async function() {
       'use strict';
   
@@ -33,6 +78,8 @@ function featureHtml(featureId, position, name) {
   
       // this will add the buttons at the top of the form //
       $("div.edit").prepend('<button type="button" id="copy" style="margin-right: 10px"><i class="far fa-copy" style="color: blue"></i> Copy Data</button><button type="button" id="paste"><i class="fas fa-paste"  style="color: blue"></i> Paste Data</button>');
+  
+      $('<button type="button" id="paste">Paste Characters Only</button>').insertBefore("#characters tr:first td span.helptext");
   
       $("#copy").click(async function (e) {
           // this will save the form data, serialized as an array into local / indexedb storage
@@ -161,48 +208,7 @@ function featureHtml(featureId, position, name) {
               }
           }
   
-          let gcd_form_characterobject = await localforage.getItem('gcd_form_characterobject');
-  
-          if (gcd_form_characterobject) {
-              const totalFormsRequired = Number(gcd_form_characterobject.find(f => f.name === 's_c_r-TOTAL_FORMS').value);
-              // First make the empty characters tables
-              for (let i = 1; i < totalFormsRequired; i++) {
-                  $('.add-row').last().click();
-              }
-  
-              for (let i = 0; i < gcd_form_characterobject.length; i++) {
-                  let controlName = gcd_form_characterobject[i].name.replace('s_c_r', 'story_character_revisions');
-  
-                  let controlValue = gcd_form_characterobject[i].value ?? "";
-  
-                  if (controlName === 'story_character_revisions-INITIAL_FORMS') {
-                      controlValue = "0";
-                  }
-  
-                  if (controlName.includes('-character')) {
-                      $(`#id_${controlName} option`).removeAttr('selected')
-                      $(`#id_${controlName}`).append(`<option value="${controlValue}" selected="">${gcd_form_characterobject[i].cn}</option>`);
-                      continue;
-                  }
-  
-                  if (controlName.includes('-group')) {
-                      $(`#id_${controlName}`).append(`<option value="${controlValue}" selected="">${gcd_form_characterobject[i].gn}</option>`);
-                      continue;
-                  }
-  
-                  if (controlName.includes('-additional_information') || controlName.includes('-is_flashback') || controlName.includes('-is_origin') || controlName.includes('-is_death')) {
-                      if (controlValue === 'on') {
-                          $(`#id_${controlName}`).prop('checked', true).change();
-                      } else {
-                          $(`#id_${controlName}`).prop('checked', false);
-                      }
-                      continue;
-                  }
-  
-                  $("#id_" + controlName).val(controlValue);
-                  $("#wmd-input-id_" + controlName).val(controlValue);
-              }
-          }
+          await pasteCharacters();
   
           const gcd_form_featureobject = await localforage.getItem('gcd_form_featureobject');
           if (gcd_form_featureobject) {
@@ -214,6 +220,22 @@ function featureHtml(featureId, position, name) {
                   $('select[name="feature_object"]').append(featureHtml(controlValue, nextPosition, friendlyName));
               }
           }
+      });
+  
+      $("#characters").on('click', '#paste', async function (e) {
+          // Check there aren't existing characters
+          var characterObjectForm = $form.serializeArray().filter(f => f.name.includes('story_character_revisions-TOTAL_FORMS'));
+          if (characterObjectForm.length > 0)
+          {
+              var totalForms = Number(characterObjectForm[0].value)
+              if (totalForms > 1)
+              {
+                  alert("Cannot paste characters when characters already added, please remove and save and come back in");
+                  return;
+              }
+          }
+  
+          await pasteCharacters();
       });
   
   })();
