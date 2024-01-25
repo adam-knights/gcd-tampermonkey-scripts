@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Editor quick helps
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Various quick helpers such as add assign button to top of page for editors
 // @author       Adam Knights
 // @match        https://www.comics.org/changeset/*/compare/
@@ -38,6 +38,12 @@
     if ($('.body_content h1 a').length > 0 && $('.body_content h1 a').prop('href').includes('/character/revision/')) {
         let character = $('.body_content h1 a').text().replace(' ', '+');
         $(`<a href="/searchNew/?q=${character}&selected_facets=facet_model_name_exact:character" target="_blank">Search for similar character</a>`).insertAfter('.body_content h1')
+    }
+
+    // Add character search button on new group changesets
+    if ($('.body_content h1 a').length > 0 && $('.body_content h1 a').prop('href').includes('/group/revision/')) {
+        let group = $('.body_content h1 a').text().replace(' ', '+');
+        $(`<a href="/searchNew/?q=${group}&selected_facets=facet_model_name_exact:group" target="_blank">Search for similar group</a>`).insertAfter('.body_content h1')
     }
 
     // Add assign to top of changeset pages where one exists at the bottom
