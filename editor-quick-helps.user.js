@@ -19,6 +19,9 @@
     // Add series search button on new series changesets
     if ($('.body_content h1 a').length > 0 && $('.body_content h1 a').prop('href').includes('/series/revision/')) {
         let series = $('.body_content h1 a').text().replace(' ', '+');
+        if (series.includes('(')) {
+            series = series.split('(')[0].trim();
+        }
         $(`<a href="/searchNew/?q=${series}&selected_facets=facet_model_name_exact:series" target="_blank">Search for similar series</a>`).insertAfter('.body_content h1')
     }
 
