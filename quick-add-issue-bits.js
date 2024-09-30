@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Quick add issue bits
 // @namespace    http://tampermonkey.net/
-// @version      0.1.0
+// @version      0.1.1
 // @description  Take editor text credits and move to creators
 // @author       Adam Knights
 // @match        https://www.comics.org/series/*/add_issue/*
@@ -14,13 +14,13 @@
 
 function getWednesdayDate() {
     let d = new Date();
-    d.setDate(d.getDate() + (2 + 7 - d.getDay()) % 7); // Get next wednesday or today if wednesday
+    d.setDate(d.getDate() + (3 + 7 - d.getDay()) % 7); // Get next wednesday or today if wednesday
     return d;
 }
 
 function getWednesday() {
     let d = getWednesdayDate();
-    let dd = d.getDate() + 1;
+    let dd = d.getDate();
     let mm = d.getMonth() + 1;
     dd = (dd > 9 ? '' : '0') + dd;
     mm = (mm > 9 ? '' : '0') + mm;
@@ -30,7 +30,8 @@ function getWednesday() {
 function getPublicationDate(offset) {
     const d = getWednesdayDate();
     const m = (d.getMonth() + offset) % 12;
-    const p = new Date(d.getFullYear(), m, 1);
+    const addYear = m < d.getMonth() ? 1 : 0;
+    const p = new Date(d.getFullYear() + addYear, m, 1);
     const monthName = p.toLocaleString('default', { month: 'long' });
 
     return `${monthName} ${p.getFullYear()}`;
@@ -63,7 +64,7 @@ function getBoomButtonHtml() {
 }
 
 function fillBoxesMarvel() {
-   let wednesday = getWednesday();
+    let wednesday = getWednesday();
 
     $('#id_number').val(getNextIssueNumber()).trigger('input');
     $('#id_indicia_publisher').val("401").change();
@@ -73,7 +74,7 @@ function fillBoxesMarvel() {
 }
 
 function fillBoxesBoom() {
-     let wednesday = getWednesday();
+    let wednesday = getWednesday();
 
     $('#id_number').val(getNextIssueNumber()).trigger('input');
     $('#id_indicia_publisher').val("75").change();
