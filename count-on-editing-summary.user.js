@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Count on editing summary
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Show a count of pending on editing summary page
 // @author       Adam Knights
 // @match        https://www.comics.org/queues/editing/
@@ -12,13 +12,13 @@
 /* eslint-env jquery */
 
 function sumCounts() {
-  let rows = $('.queues table tr');
+  let rows = $('table.border-gray-200 tr');
 
   if (rows.length === 0) {
     return 0;
   }
 
-  let count = $.map(rows, r => $.map($(r).find('td:first'), c => parseInt($(c).text().trim()))).reduce((a, b) => isNaN(a) && isNaN(b) ? 0 : isNaN(a) ? b : isNaN(b) ? a : a + b);
+  let count = $.map(rows, r => $.map($(r).find('td:eq(0)'), c => parseInt($(c).text().trim()))).reduce((a, b) => isNaN(a) && isNaN(b) ? 0 : isNaN(a) ? b : isNaN(b) ? a : a + b);
   return isNaN(count) ? 0 : count;
 }
 
@@ -26,5 +26,5 @@ function sumCounts() {
   'use strict';
 
   let total = sumCounts();
-  $('.queues h1').text($('.queues h1').text() + `(Pending count is ${total} IMPs)`);
+  $('h1').text($('h1').text() + `(Pending count is ${total} IMPs)`);
 })();

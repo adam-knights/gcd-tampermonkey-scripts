@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Compare characters helper
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  Helper to show possible errors when migrating characters
 // @author       Adam Knights
 // @match        https://www.comics.org/changeset/*/compare/
@@ -13,14 +13,17 @@
 function getCountHtml(countLeft, countRight) {
   let leftText = countLeft;
   let rightText = countRight;
+  let trClass = "border flex flex-col max-sm:border sm:table-row";
   if (countLeft < countRight) {
     rightText = `<span class="added">${countRight}</span>`;
+    trClass = trClass + " changed";
   }
   else if (countLeft > countRight) {
     rightText = `<span class="deleted">${countRight}</span>`;
+    trClass = trClass + " changed";
   }
 
-  return `<tr class="True"><td class="field_name">Char Count</td><td>${leftText}</td><td>${rightText}</td></tr>`;
+  return `<tr class="${trClass}"><td class="field_name">Char Count</td><td>${leftText}</td><td>${rightText}</td></tr>`;
 }
 
 function insertCompareHtml(insertBefore, thingsOnLeftNotInRight, thingsOnRightNotInLeft) {
@@ -39,7 +42,7 @@ function insertCompareHtml(insertBefore, thingsOnLeftNotInRight, thingsOnRightNo
       rightText = thingsOnRightNotInLeft.sort().join('<br>');
   }
 
-  insertBefore.before(`<tr class="True"><td class="field_name">Character Diffs</td><td>${leftText}</td><td>${rightText}</td></tr>`);
+  insertBefore.before(`<tr class="border flex flex-col max-sm:border sm:table-row changed"><td class="field_name">Character Diffs</td><td>${leftText}</td><td>${rightText}</td></tr>`);
   return;
 }
 
@@ -50,7 +53,7 @@ function push() { if (item) result.push(item.trim()); item = ''; }
 
 for (let i = 0; i < str.length; i++) {
   const c = str[i]
-  if (!depth && c === ';') push();
+  if (!depth && (c === ';' || c === '\n')) push();
   else {
     item += c;
     if (c === '[' || c === '(') depth++;
@@ -65,7 +68,7 @@ return result;
 (async function() {
   'use strict';
 
-  $('tr.True td:contains(Characters)').each(function() {
+  $('tr.flex-col td:contains(Characters)').each(function() {
       // Check this is a change, and not a new addition
       if ($(this).first().parent().parent().children().first().children().last().text().trim() === 'Added') {
         return;

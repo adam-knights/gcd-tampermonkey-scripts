@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Quick add issue bits
 // @namespace    http://tampermonkey.net/
-// @version      0.1.1
+// @version      0.2.0
 // @description  Take editor text credits and move to creators
 // @author       Adam Knights
 // @match        https://www.comics.org/series/*/add_issue/*
@@ -56,11 +56,11 @@ function getNextIssueNumber() {
 }
 
 function getMarvelButtonHtml() {
-    return `<input id="marvelButton" type="button" value="Marvel for ${getWednesday()}" style="color: blue; margin-right:10px">`;
+    return `<input id="marvelButton" class="btn-blue-editing inline" type="button" value="Marvel for ${getWednesday()}" style="color: blue; margin-right:10px">`;
 }
 
 function getBoomButtonHtml() {
-    return `<input id="boomButton" type="button" value="Boom! Studios for ${getWednesday()}" style="color: blue">`;
+    return `<input id="boomButton" class="btn-blue-editing inline" type="button" value="Boom! Studios for ${getWednesday()}" style="color: blue">`;
 }
 
 function fillBoxesMarvel() {
@@ -86,8 +86,8 @@ function fillBoxesBoom() {
 (async function() {
     'use strict';
 
-    $(getMarvelButtonHtml()).insertBefore($('.edit').first());
-    $(getBoomButtonHtml()).insertBefore($('.edit').first());
+    $(getMarvelButtonHtml()).insertBefore($('.editing').first());
+    $(getBoomButtonHtml()).insertBefore($('.editing').first());
 
     $('#marvelButton').click(() => fillBoxesMarvel());
     $('#boomButton').click(() => fillBoxesBoom());

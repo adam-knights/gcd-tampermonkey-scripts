@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Quick add series bits
 // @namespace    http://tampermonkey.net/
-// @version      0.2.0
+// @version      0.3.0
 // @description  Add buttons to top of series add page to help auto populate for each type
 // @author       Adam Knights
 // @match        https://www.comics.org/series/add/publisher/*
@@ -19,23 +19,31 @@ function getWednesdayDate() {
 }
 
 function getModernUSLimitedButtonHtml() {
-    return `<input id="modernUSLimitedButton" type="button" value="Magazine Limited" style="color: blue; margin-right:10px">`;
+    return `<input id="modernUSLimitedButton" class="btn-blue-editing inline" type="button" value="Magazine Limited" style="color: blue; margin-right:10px">`;
 }
 
 function getModernUSOngoingButtonHtml() {
-    return `<input id="modernUSOngoingButton" type="button" value="Magazine Ongoing" style="color: blue; margin-right:10px">`;
+    return `<input id="modernUSOngoingButton" class="btn-blue-editing inline" type="button" value="Magazine Ongoing" style="color: blue; margin-right:10px">`;
 }
 
 function getModernUSOneShotButtonHtml() {
-    return `<input id="modernUSOneShotButton" type="button" value="Magazine One-Shot" style="color: blue; margin-right:10px">`;
+    return `<input id="modernUSOneShotButton" class="btn-blue-editing inline" type="button" value="Magazine One-Shot" style="color: blue; margin-right:10px">`;
 }
 
 function getCollectedTPCurrentButtonHtml() {
-    return `<input id="collectedTPCurrentButton" type="button" value="TP Current" style="color: blue; margin-right:10px">`;
+    return `<input id="collectedTPCurrentButton" class="btn-blue-editing inline" type="button" value="TP Current" style="color: blue; margin-right:10px">`;
 }
 
 function getCollectedTPSingletonButtonHtml() {
-    return `<input id="collectedTPSingletonButton" type="button" value="TP Singleton" style="color: blue; margin-right:10px">`;
+    return `<input id="collectedTPSingletonButton" class="btn-blue-editing inline" type="button" value="TP Singleton" style="color: blue; margin-right:10px">`;
+}
+
+function getCollectedHCCurrentButtonHtml() {
+    return `<input id="collectedHCCurrentButton" class="btn-blue-editing inline" type="button" value="HC Current" style="color: blue; margin-right:10px">`;
+}
+
+function getCollectedHCSingletonButtonHtml() {
+    return `<input id="collectedHCSingletonButton" class="btn-blue-editing inline" type="button" value="HC Singleton" style="color: blue; margin-right:10px">`;
 }
 
 function fillBoxesUSModern() {
@@ -48,10 +56,8 @@ function fillBoxesUSModern() {
     const dd = new Date(d.getFullYear() + addYear, m, 1);
 
     $('#id_color').val('color');
-    $('#id_dimensions').val('standard Modern Age US');
     $('#id_paper_stock').val('glossy');
 
-    $('#id_publication_type').val("2").change();
     $('#id_year_began').val(`${dd.getFullYear()}`);
     $('#id_language').val("25").change();
     $('#id_has_indicia_printer').prop('checked', true);
@@ -61,6 +67,8 @@ function fillBoxesUSModern() {
 
 function fillBoxesMagazine(isMarvel) {
     $('#id_binding').val('saddle-stitched');
+    $('#id_dimensions').val('standard Modern Age US');
+    $('#id_publication_type').val("2").change();
     $('#id_has_isbn').prop('checked', false);
 
     if (isMarvel) {
@@ -74,6 +82,22 @@ function fillBoxesMagazine(isMarvel) {
 
 function fillBoxesTP(isMarvel) {
     $('#id_binding').val('trade paperback');
+    $('#id_publication_type').val("1").change();
+    $('#id_dimensions').val('standard Modern Age US');
+    $('#id_has_indicia_frequency').prop('checked', false);
+    $('#id_has_isbn').prop('checked', true);
+
+    if (isMarvel) {
+        $('#id_has_rating').prop('checked', true);
+    } else {
+        $('#id_has_rating').prop('checked', false);
+    }
+}
+
+function fillBoxesHC(isMarvel) {
+    $('#id_binding').val('hardcover');
+    $('#id_publication_type').val("1").change();
+    $('#id_dimensions').val('');
     $('#id_has_indicia_frequency').prop('checked', false);
     $('#id_has_isbn').prop('checked', true);
 
@@ -138,18 +162,44 @@ function fillBoxesCollectedTPSingleton() {
     $('#id_is_current').prop('checked', false);
 }
 
+function fillBoxesCollectedHCCurrent() {
+    $('#id_reservation_requested').prop('checked', false);
+    const isMarvel = fillBoxesUSModern();
+    fillBoxesHC(isMarvel);
+    $('#id_publishing_format').val('collected edition');
+    $('#id_is_singleton').prop('checked', false);
+    $('#id_year_ended').val('');
+    $('#id_is_current').prop('checked', true);
+}
+
+function fillBoxesCollectedHCSingleton() {
+    $('#id_reservation_requested').prop('checked', true);
+    const isMarvel = fillBoxesUSModern();
+    fillBoxesHC(isMarvel);
+    $('#id_publishing_format').val('collected edition');
+    $('#id_is_singleton').prop('checked', true);
+
+    let d = getWednesdayDate();
+    $('#id_year_ended').val($('#id_year_began').val());
+    $('#id_is_current').prop('checked', false);
+}
+
 (async function() {
     'use strict';
 
-    $(getModernUSLimitedButtonHtml()).insertBefore($('.edit').first());
-    $(getModernUSOngoingButtonHtml()).insertBefore($('.edit').first());
-    $(getModernUSOneShotButtonHtml()).insertBefore($('.edit').first());
-    $(getCollectedTPCurrentButtonHtml()).insertBefore($('.edit').first());
-    $(getCollectedTPSingletonButtonHtml()).insertBefore($('.edit').first());
+    $(getModernUSLimitedButtonHtml()).insertBefore($('.editing').first());
+    $(getModernUSOngoingButtonHtml()).insertBefore($('.editing').first());
+    $(getModernUSOneShotButtonHtml()).insertBefore($('.editing').first());
+    $(getCollectedTPCurrentButtonHtml()).insertBefore($('.editing').first());
+    $(getCollectedTPSingletonButtonHtml()).insertBefore($('.editing').first());
+    $(getCollectedHCCurrentButtonHtml()).insertBefore($('.editing').first());
+    $(getCollectedHCSingletonButtonHtml()).insertBefore($('.editing').first());
 
     $('#modernUSLimitedButton').click(() => fillBoxesUSModernLimited(false));
     $('#modernUSOngoingButton').click(() => fillBoxesUSModernOngoing(false));
     $('#modernUSOneShotButton').click(() => fillBoxesUSModernOneShot(false));
     $('#collectedTPCurrentButton').click(() => fillBoxesCollectedTPCurrent());
     $('#collectedTPSingletonButton').click(() => fillBoxesCollectedTPSingleton());
+    $('#collectedHCCurrentButton').click(() => fillBoxesCollectedHCCurrent());
+    $('#collectedHCSingletonButton').click(() => fillBoxesCollectedHCSingleton());
 })();
