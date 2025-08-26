@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Copy and paste story complete
 // @namespace    http://tampermonkey.net/
-// @version      0.7.1
+// @version      0.7.2
 // @description  Adds button to copy a story on edit story page, works to paste on new story from 'add story'.
 // @author       Adam Knights
 // @require      https://cdnjs.cloudflare.com/ajax/libs/localforage/1.9.0/localforage.min.js
@@ -41,7 +41,7 @@ async function pasteCharactersWithUniversesAndGroups() {
         const totalGroupFormsRequired = Number(gcd_form_groupobject.find(f => f.name === 's_g_r-TOTAL_FORMS').value);
         // First make the empty groups tables
         for (let i = 1; i < totalGroupFormsRequired; i++) {
-            $('.add-row').eq(2).click(); // There are 3 now, this is currently the last one
+            $('.dynamic-form-add a.btn-blue-editing:contains("Add Another")').eq(2).click(); // There are 3 now, this is currently the last one
         }
     }
 
@@ -51,7 +51,7 @@ async function pasteCharactersWithUniversesAndGroups() {
         const totalCharacterFormsRequired = Number(gcd_form_characterobject.find(f => f.name === 's_c_r-TOTAL_FORMS').value);
         // First make the empty characters tables
         for (let i = 1; i < totalCharacterFormsRequired; i++) {
-            $('.add-row').eq(1).click(); // There are 3 now, this is currently the middle one
+            $('.dynamic-form-add a.btn-blue-editing:contains("Add Another")').eq(1).click(); // There are 3 now, this is currently the middle one
         }
     }
 
